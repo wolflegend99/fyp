@@ -10,23 +10,26 @@ import dataset
 import constants as C
 print(dir)
 
-
-class Env(gym.Env):
+class Environment(gym.Env):
   def __init__(self, dataset):
     self.dataset = Dataset()
-    self.X, self.y = preprocess(dataset)
+    self.X, self.y = self.dataset.preprocess()
+    self.X_train, self.X_test, self.y_train, self.y_test = self.dataset.split(self.X, self.y, 0.2)
+    self.X_train, self.X_test = self.dataset.scale(self.X_train, self.X_test)
     self.model1 = Model(params go here)
     self.model2 = Model(params go here)
     self.model3 = Model(params go here)
-'''
+    #model=[None]
+    self.reset()
+
   def reset(self):
-    layers = T.rand(C.MIN_HIDDEN_LAYERS, C.MAX_HIDDEN_LAYERS)
-    neurons = T.rand(C.MIN_NODES, C.MAX_NODES)
+    layers = np.random.randint(C.MIN_HIDDEN_LAYERS, C.MAX_HIDDEN_LAYERS)
+    neurons = np.random.randint(C.MIN_NODES, C.MAX_NODES)
     lr = T.uniform(u, sigma)
-    self.model1.initialise(layers, neurons, lr)
-    self.model2.initialise(layers, neurons, lr)
+    self.model1 = Model(layers, neurons, lr)
+    self.model2 (layers, neurons, lr)
     self.model3.initialise(layers, neurons, lr)
-  
+'''
   def step(self, action, agent_no):
     if agent_no == 1:
       state_, reward = change_layers(action)

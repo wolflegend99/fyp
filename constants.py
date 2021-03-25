@@ -14,6 +14,6 @@ DIR_PATH='/home/wolfy/projects/fyp/datasets' ###configure this on local repo
 TEST_SPLIT_FRACTION=0.2
 RANDOM_SAMPLE_LIMIT=5
 
-NO_OF_AGENTS=5
+NO_OF_AGENTS=3
 
 

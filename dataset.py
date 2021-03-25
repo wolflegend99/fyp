@@ -44,7 +44,7 @@ class Dataset():
         sample = data.sample(n=limit)
         return sample
     
-    def shuffle(self, data)
+    def shuffle(self, data):
         return data.sample(frac=1)
     
     def get_dimensions(self, data):

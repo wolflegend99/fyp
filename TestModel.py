@@ -4,8 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-class Model(nn.Module):
-  def __init__(self, input_dims, output_dims, hidden_dim_array = [], non_linear_func_array = []):
+class TestModel(nn.Module):
+  def __init__(self, input_dims, output_dims, layers, neurons, lr):
     super(Model, self).__init__()
     self.input_dims = input_dims
     self.non_linear_func_array = non_linear_func_array

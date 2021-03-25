@@ -13,7 +13,8 @@ class Network(nn.Module):
     self.output = nn.Linear(self.hd_dims[-1], self.output_dims)
 
     self.optimizer = optim.Adam(self.parameters(), lr = self.lr)
-  
+  def initialise(self, layers, neurons, lr):
+    pass
   def forward(self, x):
     for layers in self.fcs:
       x = F.relu(layers(x))
@@ -90,7 +91,6 @@ class Network(nn.Module):
   
   def remove_layers(self, index):
     self.fcs.__delitem__(index)
-
 
   def print_param(self):
     x = next(self.parameters()).data
