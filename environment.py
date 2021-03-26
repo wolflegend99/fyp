@@ -16,16 +16,17 @@ class Environment(gym.Env):
     self.X, self.y = self.dataset.preprocess()
     self.X_train, self.X_test, self.y_train, self.y_test = self.dataset.split(self.X, self.y, 0.2)
     self.X_train, self.X_test = self.dataset.scale(self.X_train, self.X_test)
+
     self.model1 = Model(params go here)
     self.model2 = Model(params go here)
     self.model3 = Model(params go here)
     #model=[None]
-    self.reset()
+    #self.reset()
 
   def reset(self):
     layers = np.random.randint(C.MIN_HIDDEN_LAYERS, C.MAX_HIDDEN_LAYERS)
     neurons = np.random.randint(C.MIN_NODES, C.MAX_NODES)
-    lr = T.uniform(u, sigma)
+    lr = T.normal(mean = u, std = sigma)
     self.model1 = Model(layers, neurons, lr)
     self.model2 (layers, neurons, lr)
     self.model3.initialise(layers, neurons, lr)
