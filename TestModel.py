@@ -3,6 +3,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+import constants as C
+from statistics import mean
+
+
 class TestModel(nn.Module):
     def __init__(self, input_dims, output_dims, lr, num_layers, num_nodes):
         super(TestModel, self).__init__()
@@ -15,6 +19,9 @@ class TestModel(nn.Module):
         self.output = None
         self.optimizer = None
         self.initialise(num_layers, num_nodes, lr)
+        self.criterion = nn.CrossEntropyLoss()
+        # self.criterion = nn.BCELoss()
+        
 
     def initialise(self, layers, neurons, lr):
         nodes = [neurons]*self.num_layers
@@ -26,7 +33,8 @@ class TestModel(nn.Module):
 
     def forward(self, x):
         for layer in self.fcs:
-            x = F.relu(layer(x))
+            x = layer(x)
+            x = F.relu(x)
         x = self.output(x)
         return x
 
@@ -125,8 +133,61 @@ class TestModel(nn.Module):
         x = next(self.parameters()).data
         print(x)
 
-    def train(self, X_train, y_train):
-        pass
+    def train(self, trainloader):
 
-    def test(self, X_test, y_test):
-        pass
+        loss_list, acc_list = [], []
+        for epochs in range(C.EPOCHS):
+            correct = 0
+            total = 0
+            train_loss = 0
+            for data, target in trainloader:   # print("Target = ",target[0].item())
+                # clear the gradients of all optimized variables
+                self.optimizer.zero_grad()
+                # forward pass: compute predicted outputs by passing inputs to the model
+                output = self.forward(data.float())
+                target = target.type(T.FloatTensor)
+                loss = self.criterion(output, target.long().squeeze())
+                # backward pass: compute gradient of the loss with respect to model parameters
+                loss.backward()
+                # perform a single optimization step (parameter update)
+                self.optimizer.step()
+                # update running training loss
+                train_loss += loss.item()*data.size(0)
+                total += target.size(0)
+
+                # accuracy
+                _, predicted = T.max(output.data, 1)
+                correct += (predicted == target.squeeze()).sum().item()
+            acc_list.append(100*correct/total)
+            loss_list.append(train_loss/total)
+
+        return mean(acc_list[-4:]), mean(loss_list[-4:])
+    
+    
+    def test(self, testloader):
+        correct = 0
+        total = 0
+        val_loss = 0
+        with T.no_grad():
+            for data, target in testloader:
+
+            # Predict Output
+                output = self.forward(data.float())
+
+            # Calculate Loss
+                target = target.view(-1)
+                loss = self.criterion(output, target)
+                val_loss += loss.item()*data.size(0)
+            # Get predictions from the maximum value
+                _, predicted = T.max(output.data, 1)
+
+            # Total number of labels
+                total += target.size(0)
+
+        # Total correct predictions
+                correct += (predicted == target.squeeze()).sum().item()
+
+    # calculate average training loss and accuracy over an epoch
+        val_loss = val_loss/len(testloader.dataset)
+        accuracy = 100 * correct/float(total)
+        return accuracy, val_loss
