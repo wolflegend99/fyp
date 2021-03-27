@@ -9,11 +9,14 @@ MAX_NODES=64
 
 SYNCH_STEP=5
 
-DIR_PATH='/home/wolfy/projects/fyp/datasets' ###configure this on local repo
+DIR_PATH='./datasets/' ###configure this on local repo
 
 TEST_SPLIT_FRACTION=0.2
 RANDOM_SAMPLE_LIMIT=5
+SAMPLE_SIZE=100
+EPOCHS=20
 
 NO_OF_AGENTS=3
+BATCH_SIZE = 100
 
 

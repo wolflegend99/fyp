@@ -1,3 +1,8 @@
+import torch as T
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+
 class Network(nn.Module):
   def __init__(self, lr, input_dims, hd_dims , output_dims):
     super(Network, self).__init__()
