@@ -18,18 +18,21 @@ class TestModel(nn.Module):
         self.fcs = None
         self.output = None
         self.optimizer = None
-        self.initialise(num_layers, num_nodes, lr)
+        self.initialise(num_layers, num_nodes)
         self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
         # self.criterion = nn.BCELoss()
         
 
-    def initialise(self, layers, neurons, lr):
+    def initialise(self, layers, neurons):
         nodes = [neurons]*self.num_layers
         hidden_layers = zip(nodes[:-1], nodes[1:])
         self.fcs = nn.ModuleList([nn.Linear(*self.input_dims, neurons)])
         self.fcs.extend([nn.Linear(h1, h2) for h1, h2 in hidden_layers])
         self.output = nn.Linear(neurons, self.output_dims)
-        self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        self.num_layers = layers
+        self.num_nodes = neurons
+        
 
     def forward(self, x):
         for layer in self.fcs:
@@ -61,30 +64,29 @@ class TestModel(nn.Module):
 
         # reset weight and grad variables to new size
             id1, id2 = self.fcs[index].weight.shape
-            print(id2, id1+num)
+            #print(id2, id1+num)
             self.fcs[index] = nn.Linear(id2, id1+num)
 
         # set the weight data to new values
-            self.fcs[index].weight.data = T.tensor(new_wi, requires_grad=True)
-
+            self.fcs[index].weight.data = new_wi.clone().detach().requires_grad_(True)
             if index == len(self.fcs)-1:
                 # new_wo = T.cat((self.output.weight, hl_output), dim = 1)
                 id1, id2 = self.output.weight.shape
                 self.output = nn.Linear(id2+num, id1)
-                self.output.weight.data = T.tensor(new_wo, requires_grad=True)
+                self.output.weight.data = new_wo.clone().detach().requires_grad_(True)
 
             else:
                 # new_wo = T.cat((self.fcs[index+1].weight, hl_output),
                 # dim = 1)
                 id1, id2 = self.fcs[index+1].weight.shape
                 self.fcs[index+1] = nn.Linear(id2+num, id1)
-                self.fcs[index+1].weight.data = T.tensor(new_wo,
-                                                         requires_grad=True)
+                self.fcs[index+1].weight.data = new_wo.clone().detach().requires_grad_(True)
 
         self.num_nodes += num
+        return [self.num_layers, self.num_nodes]
 
     def remove_neurons(self, num):
-
+        
         # Getting the older weights of all layers
         weights = [fc.weight.data for fc in self.fcs]
         weights.append(self.output.weight.data)
@@ -101,20 +103,18 @@ class TestModel(nn.Module):
             id1, id2 = self.fcs[index].weight.shape
             self.fcs[index] = nn.Linear(id2, id1-num)
             # set the weight data to new values
-            self.fcs[index].weight.data = T.tensor(new_wi,
-                                                      requires_grad=True)
+            self.fcs[index].weight.data = new_wi.clone().detach().requires_grad_(True)
 
             if index == len(self.fcs)-1:
                 id1, id2 = self.output.weight.shape
                 self.output = nn.Linear(id2-num, id1)
-                self.output.weight.data = T.tensor(new_wo,
-                                                       requires_grad=True)
+                self.output.weight.data = new_wo.clone().detach().requires_grad_(True)
             else:
                 id1, id2 = self.fcs[index+1].weight.shape
                 self.fcs[index+1] = nn.Linear(id2-num, id1)
-                self.fcs[index+1].weight.data = T.tensor(new_wo,
-                                                         requires_grad=True)
+                self.fcs[index+1].weight.data = new_wo.clone().detach().requires_grad_(True)
         self.num_nodes -= num
+        return [self.num_layers, self.num_nodes]
 
     def add_layers(self, num):
         last_hid_neurons = self.fcs[-1].weight.shape[0]
@@ -122,12 +122,16 @@ class TestModel(nn.Module):
         new_hid_layers = zip(new_hid_dims[:-1], new_hid_dims[1:])
         self.fcs.extend([nn.Linear(h1, h2) for h1, h2 in new_hid_layers])
         self.num_layers += num
+        
+        return [self.num_layers, self.num_nodes]
 
     def remove_layers(self, num):
         x = len(self.fcs)-1
         for index in range(x, x-num, -1):
             self.fcs.__delitem__(index)
         self.num_layers -= num
+        
+        return [self.num_layers, self.num_nodes]
 
     def print_param(self):
         x = next(self.parameters()).data
