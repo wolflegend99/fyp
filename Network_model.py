@@ -2,101 +2,101 @@ import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import numpy as np
 
-class Network(nn.Module):
-  def __init__(self, lr, input_dims, hd_dims , output_dims):
-    super(Network, self).__init__()
+import constants as C
 
-    self.lr = lr
-    self.input_dims = input_dims
-    self.hd_dims = hd_dims
-    self.output_dims = output_dims
+class CriticNetwork(nn.Module):
+    def __init__(self, lr, input_dims, n_actions):
+        super(CriticNetwork, self).__init__()
 
-    hidden_layers = zip(self.hd_dims[:-1], self.hd_dims[1:])
-    self.fcs = nn.ModuleList([nn.Linear(*self.input_dims, self.hd_dims[0])])
-    self.fcs.extend([nn.Linear(h1, h2) for h1, h2 in hidden_layers])
-    self.output = nn.Linear(self.hd_dims[-1], self.output_dims)
-
-    self.optimizer = optim.Adam(self.parameters(), lr = self.lr)
-  def initialise(self, layers, neurons, lr):
-    pass
-  def forward(self, x):
-    for layers in self.fcs:
-      x = F.relu(layers(x))
+        self.lr = lr
+        self.input_shape = input_dims
+        self.n_actions = n_actions
+        self.fc1 = nn.Linear(*input_dims,400)
+        self.batch1 = nn.LayerNorm(400)
+        self.fc2 = nn.Linear(400,300)
+        self.batch2 = nn.LayerNorm(300)
+        self.fc3 = nn.Linear(300, 1)
     
-    x = self.output(x)
-    return x
-  
-  def add_neurons(self, num, index):
+        self.action_value = nn.Linear(n_actions, 300)
 
-    # Getting the older weights of all layers
-    weights = [fc.weight.data for fc in self.fcs]
-    weights.append(self.output.weight.data)
+        self.optimizer = optim.Adam(self.parameters(), lr = self.lr, weight_decay=0.01)
 
-    # make the new weights in and out of hidden layer you are adding neurons to
-    hl_input = T.zeros((num, weights[index].shape[1]))
-    nn.init.xavier_uniform_(hl_input, gain=nn.init.calculate_gain('relu'))
-    hl_output = T.zeros((weights[index+1].shape[0], num))
-    nn.init.xavier_uniform_(hl_output, gain=nn.init.calculate_gain('relu'))
-
-    # concatenate the old weights with the new weights
-    new_wi = T.cat((weights[index], hl_input), dim = 0)
-    new_wo = T.cat((weights[index+1], hl_output), dim = 1)
-
-    # reset weight and grad variables to new size
-    id1, id2 = self.fcs[index].weight.shape
-    self.fcs[index] = nn.Linear(id2, id1+num)
-    # set the weight data to new values
-    self.fcs[index].weight.data = T.tensor(new_wi, requires_grad=True)
-
-    if index == len(self.fcs)-1:
-      id1, id2 = self.output.weight.shape
-      self.output = nn.Linear(id2+num, id1)
-      self.output.weight.data = T.tensor(new_wo , requires_grad=True)
-    else:
-      id1, id2 = self.fcs[index+1].weight.shape
-      self.fcs[index+1] = nn.Linear(id2+num, id1)
-      self.fcs[index+1].weight.data = T.tensor(new_wo , requires_grad=True)
-  
-  def remove_neurons(self, num, index):
+        self.initialize_weights_bias()
+    def initialize_weights_bias(self):
     
-    # Getting the older weights of all layers
-    weights = [fc.weight.data for fc in self.fcs]
-    weights.append(self.output.weight.data)
+        f1 = 1/np.sqrt(self.fc1.weight.data.size()[0])
+        self.fc1.weight.data.uniform_(-f1, f1)
+        self.fc1.bias.data.uniform_(-f1, f1)
+        
+        f2 = 1/np.sqrt(self.fc2.weight.data.size()[0])
+        self.fc2.weight.data.uniform_(-f2, f2)
+        self.fc2.bias.data.uniform_(-f2, f2)
 
-    init_neurons = weights[index].shape[0]
-    fin_neurons = init_neurons - num
+        self.fc3.weight.data.uniform_(-0.003, 0.003)
+        self.fc3.bias.data.uniform_(-0.003, 0.003)
 
-    #Getting new weights by slicing the old weight tensor
-    new_wi = T.narrow(weights[index], 0, 0, fin_neurons)
-    new_wo = T.narrow(weights[index+1], 1, 0, fin_neurons)
+        f4 = 1/np.sqrt(self.action_value.weight.data.size()[0])
+        self.action_value.weight.data.uniform_(-f4, f4)
+        self.action_value.bias.data.uniform_(-f4, f4)
 
-    # reset weight and grad variables to new size
-    # set the weight data to new values
-    id1, id2 = self.fcs[index].weight.shape
-    self.fcs[index] = nn.Linear(id2, id1-num)
-    # set the weight data to new values
-    self.fcs[index].weight.data = T.tensor(new_wi, requires_grad=True)
+    def forward(self, state, action):
+        x = self.fc1(state)
+        x = self.batch1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        x = self.batch2(x)
+        action_value = self.action_value(action)
+        state_action_value = F.relu(T.add(x,action_value))
+        state_action_value = self.fc3(state_action_value)
 
-    if index == len(self.fcs)-1:
-      id1, id2 = self.output.weight.shape
-      self.output = nn.Linear(id2-num, id1)
-      self.output.weight.data = T.tensor(new_wo , requires_grad=True)
-    else:
-      id1, id2 = self.fcs[index+1].weight.shape
-      self.fcs[index+1] = nn.Linear(id2-num, id1)
-      self.fcs[index+1].weight.data = T.tensor(new_wo , requires_grad=True)
+        return state_action_value
+    
 
-  def add_layers(self, num):
-    last_hid_neurons = self.fcs[-1].weight.shape[0]
-    new_hid_dims = [last_hid_neurons]*(num+1)
+class ActorNetwork(nn.Module):
+    def __init__(self, lr, input_dims, hd1_dims, hd2_dims,action_dim):
+        super(ActorNetwork, self).__init__()
 
-    new_hid_layers = zip(new_hid_dims[:-1], new_hid_dims[1:])
-    self.fcs.extend([nn.Linear(h1, h2) for h1, h2 in new_hid_layers])
+        self.lr = lr
+        self.input_dims = input_dims
+        self.hd1_dims = hd1_dims
+        self.hd2_dims = hd2_dims
+        self.action_dim = action_dim
+
+        self.fc1 = nn.Linear(*self.input_dims, self.hd1_dims)
+        self.fc2 = nn.Linear(self.hd1_dims, self.hd2_dims)
+        self.fc3 = nn.Linear(self.hd2_dims, self.action_dim)
+
+        self.nb1 = nn.LayerNorm(self.hd1_dims)
+        self.nb2 = nn.LayerNorm(self.hd2_dims)
+
+        self.optimizer = optim.Adam(self.parameters(), lr = self.lr)
+
+        self.initialize_weights_bias()
+    def initialize_weights_bias(self):
+
+        f1 = 1/np.sqrt(self.fc1.weight.data.size()[0])
+        self.fc1.weight.data.uniform_(-f1, f1)
+        self.fc1.bias.data.uniform_(-f1, f1)
+
+
+        f2 = 1/np.sqrt(self.fc2.weight.data.size()[0])
+        self.fc2.weight.data.uniform_(-f2, f2)
+        self.fc2.bias.data.uniform_(-f2, f2)
+
+        f3 = 0.003
+        self.fc3.weight.data.uniform_(-f3,f3)
+        self.fc3.bias.data.uniform_(-f3,f3)
+        
+    def forward(self, state):
+        x = self.fc1(state)
+        x = self.nb1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        x = self.nb2(x)
+        x = F.relu(x)
+        x = T.tanh(self.fc3(x))
+        
+        return round(x.item())
   
-  def remove_layers(self, index):
-    self.fcs.__delitem__(index)
-
-  def print_param(self):
-    x = next(self.parameters()).data
-    print(x)

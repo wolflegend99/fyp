@@ -33,7 +33,7 @@ class DDPGAgent():
 
         self.localActor.train()
 
-        return noisy_action.detach().numpy()[0]
+        return round(noisy_action.detach().numpy()[0])
     
     def store_transition(self, state, action, reward, next_state):
         self.replayBuffer.store_transition(state, action, reward, next_state)
@@ -43,7 +43,7 @@ class DDPGAgent():
         if self.replayBuffer.mem_cntr < self.batch_size:
             return
 
-        states, actions, rewards, next_states, done = self.replayBuffer.sample_buffer(self.batch_size)
+        states, actions, rewards, next_states = self.replayBuffer.sample_buffer(self.batch_size)
 
         states = torch.tensor(states, dtype = torch.float)
         actions = torch.tensor(actions, dtype = torch.float)

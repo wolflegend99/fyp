@@ -40,7 +40,7 @@ class MADDPG:
                 done = False
                 if reward == 0:
                     done = True
-                self.agents[agent_no].store_transition(agent_states[agent_no], action, reward, next_state, done)
+                self.agents[agent_no].store_transition(agent_states[agent_no], action, reward, next_state)
                 self.agents[agent_no].learn()
                 returns[agent_no] += reward
                 agent_states[agent_no] = next_state
@@ -48,9 +48,11 @@ class MADDPG:
                 if steps % C.SYNCH_STEPS == 0:
                     synched_states = self.env.synch()
                     agent_states = [synched_states for i in range(self.num_agents)]
+                print("Steps: ", steps)
+                print("Returns0 : ", returns[0])
+                print("Returns1 : ", returns[1])
             for i in range(self.num_agents):
                 return_list[i].append(returns[i])
-                if len(return_list[i]) >= 20:
-                    means[i] = np.mean(return_list[i][-20:])
-                else:
-                    means[i] = np.mean(return_list[i][-len(return_list[i]):])
+                means[i] = np.mean(return_list[i][-20:])
+            print("Score Model1 : ",means[0])
+            print("Score model2 : ",means[1])

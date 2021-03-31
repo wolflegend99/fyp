@@ -50,15 +50,15 @@ class Environment():
     
     model1_action = model2_neurons - model1_neurons
     if(model1_action >= 0):
-        self.model1.add_neurons(model1_action)
+        self.model1.add_neurons(int(model1_action))
     else:
-        self.model1.remove_neurons(-model1_action)
+        self.model1.remove_neurons(int(-model1_action))
     
     model2_action = model1_layers - model2_layers
     if(model2_action >= 0):
-        self.model2.add_layers(model2_action)
+        self.model2.add_layers(int(model2_action))
     else:
-        self.model2.remove_layers(-model2_action)
+        self.model2.remove_layers(int(-model2_action))
     
     return [self.model2.num_layers, self.model1.num_nodes]
     
@@ -67,9 +67,9 @@ class Environment():
   def change_layers(self, action):
     
     if action >= 0:
-        next_state = self.model1.add_layers(action)
+        next_state = self.model1.add_layers(int(action))
     else:
-        next_state = self.model1.remove_layers(-action)
+        next_state = self.model1.remove_layers(-int(action))
     train_acc, train_loss = self.model1.train(self.train_loader)
     test_acc, test_loss = self.model1.test(self.test_loader)
     reward = H.reward(train_acc, train_loss,
@@ -81,9 +81,9 @@ class Environment():
   def change_neurons(self, action):
     
     if action >= 0:
-        next_state = self.model2.add_neurons(action)
+        next_state = self.model2.add_neurons(int(action))
     else:
-        next_state = self.model2.remove_neurons(-action)
+        next_state = self.model2.remove_neurons(-int(action))
     train_acc, train_loss = self.model2.train(self.train_loader)
     test_acc, test_loss = self.model2.test(self.test_loader)
     reward = H.reward(train_acc, train_loss,
