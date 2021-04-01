@@ -23,7 +23,7 @@ class CriticNetwork(nn.Module):
 
         self.optimizer = optim.Adam(self.parameters(), lr = self.lr, weight_decay=0.01)
 
-        self.initialize_weights_bias()
+        #self.initialize_weights_bias()
     def initialize_weights_bias(self):
     
         f1 = 1/np.sqrt(self.fc1.weight.data.size()[0])
@@ -73,7 +73,7 @@ class ActorNetwork(nn.Module):
 
         self.optimizer = optim.Adam(self.parameters(), lr = self.lr)
 
-        self.initialize_weights_bias()
+        #self.initialize_weights_bias()
     def initialize_weights_bias(self):
 
         f1 = 1/np.sqrt(self.fc1.weight.data.size()[0])
@@ -96,7 +96,8 @@ class ActorNetwork(nn.Module):
         x = self.fc2(x)
         x = self.nb2(x)
         x = F.relu(x)
+        #x = self.fc3(x)
         x = T.tanh(self.fc3(x))
         
-        return round(x.item())
+        return x.item()
   

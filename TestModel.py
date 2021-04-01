@@ -95,6 +95,7 @@ class TestModel(nn.Module):
             fin_neurons = init_neurons - num
 
             # Getting new weights by slicing the old weight tensor
+            fin_neurons = max(fin_neurons, 1)
             new_wi = T.narrow(self.fcs[index].weight, 0, 0, fin_neurons)
             new_wo = T.narrow(weights[index+1], 1, 0, fin_neurons)
 
@@ -127,7 +128,7 @@ class TestModel(nn.Module):
 
     def remove_layers(self, num):
         x = len(self.fcs)-1
-        for index in range(x, x-num, -1):
+        for index in range(x, max(0,x-num), -1):
             self.fcs.__delitem__(index)
         self.num_layers -= num
         

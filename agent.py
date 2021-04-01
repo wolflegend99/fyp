@@ -4,6 +4,7 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 from helper import OrnsteinUhlenbeckActionNoise
+import constants as C
 
 
 class DDPGAgent():
@@ -33,7 +34,7 @@ class DDPGAgent():
 
         self.localActor.train()
 
-        return round(noisy_action.detach().numpy()[0])
+        return round(C.MAX_ACTION*noisy_action.detach().numpy()[0])
     
     def store_transition(self, state, action, reward, next_state):
         self.replayBuffer.store_transition(state, action, reward, next_state)
