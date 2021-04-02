@@ -7,16 +7,15 @@ from helper import OrnsteinUhlenbeckActionNoise
 import constants as C
 
 class DDPGAgent():
-    def __init__(self, alpha, beta, tau, input_dims, n_actions, hd1_dims = 400, hd2_dims = 300, mem_size = 1000000, gamma = 0.99, batch_size = 64):
+    def __init__(self, alpha, beta, tau, input_dims, n_actions, hd1_dims = 400, hd2_dims = 300, mem_size = 1000000, gamma = 0.99, batch_size = 64, agent_no=1):
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma
         self.tau = tau
         self.batch_size = batch_size
-    
-        self.localActor = ActorNetwork(self.alpha, input_dims, hd1_dims, hd2_dims, n_actions)
+        self.localActor = ActorNetwork(self.alpha, input_dims, hd1_dims, hd2_dims, n_actions, agent_no)
         self.localCritic = CriticNetwork(self.beta, input_dims, n_actions)
-        self.targetActor = ActorNetwork(self.alpha, input_dims, hd1_dims, hd2_dims, n_actions)
+        self.targetActor = ActorNetwork(self.alpha, input_dims, hd1_dims, hd2_dims, n_actions,agent_no)
         self.targetCritic = CriticNetwork(self.beta, input_dims, n_actions)
 
         self.replayBuffer = ReplayBuffer(mem_size, input_dims, n_actions)
@@ -32,7 +31,8 @@ class DDPGAgent():
         noisy_action = action + torch.tensor(self.actionNoise(), dtype = torch.float32)
 
         self.localActor.train()
-        final_action = C.MAX_ACTION[agent_no]*noisy_action.detach().numpy()[0]
+        #final_action = C.MAX_ACTION[agent_no]*noisy_action.detach().numpy()[0]
+        final_action = noisy_action.detach().numpy()[0]
 
         return (final_action, round(final_action))
     

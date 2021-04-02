@@ -40,7 +40,7 @@ class Environment():
     elif agent_no == 1:
       state_, reward =  self.change_neurons(action)
     
-    return state_, reward
+    return (state_, reward)
   
   def synch(self):
     model1_layers = self.model1.num_layers
@@ -77,7 +77,7 @@ class Environment():
                       next_state, 0,
                       self.input_dims, self.output_dims)
     # reward = reward - punishment
-    return next_state, reward
+    return (next_state, reward)
   
   def change_neurons(self, action):
     
@@ -91,7 +91,7 @@ class Environment():
                       test_acc, test_loss,
                       next_state, 1,
                       self.input_dims, self.output_dims)
-    return next_state, reward
+    return (next_state, reward)
   
  
   def seed(self):

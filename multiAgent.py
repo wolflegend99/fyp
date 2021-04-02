@@ -17,7 +17,7 @@ class MADDPG:
         self.agents = [DDPGAgent(alpha = self.alpha, beta = self.beta, tau = self.tau, 
                                  input_dims = input_dims, n_actions = n_actions, hd1_dims = hd1_dims,
                                  hd2_dims = hd2_dims, mem_size = mem_size, gamma = self.gamma,
-                                 batch_size = self.batch_size) for i in range(self.num_agents)]
+                                 batch_size = self.batch_size, i) for i in range(self.num_agents)]
         self.agents_states = None
         
     
@@ -42,6 +42,7 @@ class MADDPG:
                 if reward == 0:
                     done = True
                 self.agents[agent_no].store_transition(agent_states[agent_no], action, reward, next_state)
+                print("Next state : ", next_state)
                 self.agents[agent_no].learn()
                 returns[agent_no] += reward
                 agent_states[agent_no] = next_state

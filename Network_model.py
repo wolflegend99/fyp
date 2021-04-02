@@ -55,7 +55,7 @@ class CriticNetwork(nn.Module):
     
 
 class ActorNetwork(nn.Module):
-    def __init__(self, lr, input_dims, hd1_dims, hd2_dims,action_dim):
+    def __init__(self, lr, input_dims, hd1_dims, hd2_dims,action_dim, agent_no):
         super(ActorNetwork, self).__init__()
 
         self.lr = lr
@@ -63,7 +63,7 @@ class ActorNetwork(nn.Module):
         self.hd1_dims = hd1_dims
         self.hd2_dims = hd2_dims
         self.action_dim = action_dim
-
+        self.agent_no = agent_no
         self.fc1 = nn.Linear(*self.input_dims, self.hd1_dims)
         self.fc2 = nn.Linear(self.hd1_dims, self.hd2_dims)
         self.fc3 = nn.Linear(self.hd2_dims, self.action_dim)
@@ -99,5 +99,5 @@ class ActorNetwork(nn.Module):
         #x = self.fc3(x)
         x = T.tanh(self.fc3(x))
         
-        return x.item()
+        return C.MAX_ACTION[self.agent_no]*x 
   

@@ -90,9 +90,10 @@ class TestModel(nn.Module):
         # Getting the older weights of all layers
         weights = [fc.weight.data for fc in self.fcs]
         weights.append(self.output.weight.data)
+        fin_neurons = self.num_nodes - num
         for index in range(self.num_layers):
-            init_neurons = self.fcs[index].weight.shape[0]
-            fin_neurons = init_neurons - num
+            #init_neurons = self.fcs[index].weight.shape[0]
+            #fin_neurons = num
 
             # Getting new weights by slicing the old weight tensor
             fin_neurons = max(fin_neurons, 1)
