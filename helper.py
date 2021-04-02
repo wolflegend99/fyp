@@ -18,10 +18,21 @@ def load(X_train, X_test, y_train, y_test):
     test_loader = torch.utils.data.DataLoader(test, batch_size = C.BATCH_SIZE, shuffle = True)
     return train_loader, test_loader
 
+#0 is reward for layers
+#1 is reward for nodes
 def reward(train_acc, train_loss,
             test_acc, test_loss,
-            x):
-    return np.random.randint(-10, 10)
+            x, which, in_dims, out_dims):
+    #return np.random.randint(-10, 10)
+    #trainable = (in_dims + out_dims)*x[1] + x[1]*x[1]*x[0] + out_dims + x[1]*x[0]
+    value = 0
+    if which == 0:
+        value -= (x[0]/10)*2.5
+    else:
+        value -= (x[1]**2/100)*6.25
+    value -= train_loss*7
+    value += (test_acc/100)*10
+    return value
 
 def sample(data, limit=C.SAMPLE_SIZE):
     sample = data.sample(n=limit)

@@ -20,11 +20,11 @@ class Environment():
     self.train_loader, self.test_loader = H.load(self.X_train, self.X_test,
                                                  self.y_train, self.y_test)
     
-    input_dims = [self.X.shape[1]]
-    output_dims = len(np.unique(self.y))
+    self.input_dims = [self.X.shape[1]]
+    self.output_dims = len(np.unique(self.y))
     
-    self.model1 = TestModel(input_dims, output_dims, 0.01, 3, 16)
-    self.model2 = TestModel(input_dims, output_dims, 0.01, 3, 16)
+    self.model1 = TestModel(self.input_dims, self.output_dims, 0.005, 3, 8)
+    self.model2 = TestModel(self.input_dims, self.output_dims, 0.005, 3, 8)
 
   def reset(self):
     layers = np.random.randint(C.MIN_HIDDEN_LAYERS, C.MAX_HIDDEN_LAYERS)
@@ -74,7 +74,8 @@ class Environment():
     test_acc, test_loss = self.model1.test(self.test_loader)
     reward = H.reward(train_acc, train_loss,
                       test_acc, test_loss,
-                      next_state[0])
+                      next_state, 0,
+                      self.input_dims, self.output_dims)
     # reward = reward - punishment
     return next_state, reward
   
@@ -87,8 +88,9 @@ class Environment():
     train_acc, train_loss = self.model2.train(self.train_loader)
     test_acc, test_loss = self.model2.test(self.test_loader)
     reward = H.reward(train_acc, train_loss,
-                      test_acc, test_loss, 
-                      next_state[1])
+                      test_acc, test_loss,
+                      next_state, 1,
+                      self.input_dims, self.output_dims)
     return next_state, reward
   
  
