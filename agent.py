@@ -26,7 +26,7 @@ class DDPGAgent():
         
     def choose_action(self, observation, agent_no):
         self.localActor.eval()
-        state = torch.tensor([observation], dtype = T.float32)
+        state = torch.tensor([observation], dtype = torch.float32)
         action = self.localActor.forward(state)
         noisy_action = action + torch.tensor(self.actionNoise(), dtype = torch.float32)
 
@@ -34,7 +34,7 @@ class DDPGAgent():
         #final_action = C.MAX_ACTION[agent_no]*noisy_action.detach().numpy()[0]
         final_action = noisy_action.detach().numpy()[0]
 
-        return (final_action, round(final_action))
+        return (final_action[0], np.round(final_action)[0])
     
     def store_transition(self, state, action, reward, next_state):
         self.replayBuffer.store_transition(state, action, reward, next_state)

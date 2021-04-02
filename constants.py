@@ -7,7 +7,7 @@ MAX_HIDDEN_LAYERS=4
 MIN_NODES=7
 MAX_NODES=15
 
-SYNCH_STEPS=2
+SYNCH_STEPS=15
 
 DIR_PATH='./datasets/' ###configure this on local repo
 
@@ -17,7 +17,7 @@ SAMPLE_SIZE=100
 EPOCHS=20
 
 NUM_AGENTS=2
-BATCH_SIZE = 8
+BATCH_SIZE = 32
 
 #Agent constants
 ALPHA=0.005

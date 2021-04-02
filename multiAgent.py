@@ -17,7 +17,7 @@ class MADDPG:
         self.agents = [DDPGAgent(alpha = self.alpha, beta = self.beta, tau = self.tau, 
                                  input_dims = input_dims, n_actions = n_actions, hd1_dims = hd1_dims,
                                  hd2_dims = hd2_dims, mem_size = mem_size, gamma = self.gamma,
-                                 batch_size = self.batch_size, i) for i in range(self.num_agents)]
+                                 batch_size = self.batch_size,agent_no =  i) for i in range(self.num_agents)]
         self.agents_states = None
         
     
@@ -36,7 +36,10 @@ class MADDPG:
             while steps != self.num_agents * max_steps:
                 steps += 1
                 action, rounded_action = self.agents[agent_no].choose_action(agent_states[agent_no], agent_no)
-                print(action)
+                print("Agent : ", agent_no)
+                print("Action: ", action)
+                
+                #rint(rounded_action)
                 next_state, reward = self.env.step(rounded_action, agent_no)
                 done = False
                 if reward == 0:
@@ -46,13 +49,14 @@ class MADDPG:
                 self.agents[agent_no].learn()
                 returns[agent_no] += reward
                 agent_states[agent_no] = next_state
-                agent_no = (agent_no + 1) % self.num_agents
                 if steps % C.SYNCH_STEPS == 0:
                     synched_states = self.env.synch()
                     agent_states = [synched_states for i in range(self.num_agents)]
                 print("Steps: ", steps)
-                print("Returns0 : ", returns[0])
-                print("Returns1 : ", returns[1])
+                print("Reward: ", reward)
+                print("Returns and agent: ", returns[agent_no], agent_no)
+                #print("Returns1 : ", returns[1])
+                agent_no = (agent_no + 1) % self.num_agents
             for i in range(self.num_agents):
                 return_list[i].append(returns[i])
                 means[i] = np.mean(return_list[i][-20:])

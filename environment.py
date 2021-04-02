@@ -71,12 +71,15 @@ class Environment():
     else:
         next_state = self.model1.remove_layers(-int(action))
     train_acc, train_loss = self.model1.train(self.train_loader)
+    
     test_acc, test_loss = self.model1.test(self.test_loader)
     reward = H.reward(train_acc, train_loss,
                       test_acc, test_loss,
                       next_state, 0,
                       self.input_dims, self.output_dims)
     # reward = reward - punishment
+    print("Train_acc : ", train_acc)
+    print("Test_acc : ", test_acc)
     return (next_state, reward)
   
   def change_neurons(self, action):
@@ -91,6 +94,8 @@ class Environment():
                       test_acc, test_loss,
                       next_state, 1,
                       self.input_dims, self.output_dims)
+    print("Train_acc : ", train_acc)
+    print("Test_acc : ", test_acc)
     return (next_state, reward)
   
  
