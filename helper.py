@@ -21,7 +21,7 @@ def load(X_train, X_test, y_train, y_test):
 def reward(train_acc, train_loss,
             test_acc, test_loss,
             x):
-    return np.random.randint(1, 4)
+    return np.random.randint(-10, 10)
 
 def sample(data, limit=C.SAMPLE_SIZE):
     sample = data.sample(n=limit)

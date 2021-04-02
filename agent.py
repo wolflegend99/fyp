@@ -6,7 +6,6 @@ import torch.nn.functional as F
 from helper import OrnsteinUhlenbeckActionNoise
 import constants as C
 
-
 class DDPGAgent():
     def __init__(self, alpha, beta, tau, input_dims, n_actions, hd1_dims = 400, hd2_dims = 300, mem_size = 1000000, gamma = 0.99, batch_size = 64):
         self.alpha = alpha
@@ -26,15 +25,16 @@ class DDPGAgent():
         
         self.update_parameter_weights(tau = 1)
         
-    def choose_action(self, observation):
+    def choose_action(self, observation, agent_no):
         self.localActor.eval()
         state = torch.tensor([observation], dtype = torch.float32)
         action = self.localActor.forward(state)
         noisy_action = action + torch.tensor(self.actionNoise(), dtype = torch.float32)
 
         self.localActor.train()
+        final_action = C.MAX_ACTION[agent_no]*noisy_action.detach().numpy()[0]
 
-        return round(C.MAX_ACTION*noisy_action.detach().numpy()[0])
+        return (final_action, round(final_action))
     
     def store_transition(self, state, action, reward, next_state):
         self.replayBuffer.store_transition(state, action, reward, next_state)

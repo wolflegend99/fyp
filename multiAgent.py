@@ -35,9 +35,9 @@ class MADDPG:
                 self.agents[i].actionNoise.reset()
             while steps != self.num_agents * max_steps:
                 steps += 1
-                action = self.agents[agent_no].choose_action(agent_states[agent_no])
+                action, rounded_action = self.agents[agent_no].choose_action(agent_states[agent_no], agent_no)
                 print(action)
-                next_state, reward = self.env.step(action, agent_no)
+                next_state, reward = self.env.step(rounded_action, agent_no)
                 done = False
                 if reward == 0:
                     done = True
