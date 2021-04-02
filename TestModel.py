@@ -102,19 +102,19 @@ class TestModel(nn.Module):
             # reset weight and grad variables to new size
             # set the weight data to new values
             id1, id2 = self.fcs[index].weight.shape
-            self.fcs[index] = nn.Linear(id2, id1-num)
+            self.fcs[index] = nn.Linear(id2, max(id1-num, 1))
             # set the weight data to new values
             self.fcs[index].weight.data = new_wi.clone().detach().requires_grad_(True)
 
             if index == len(self.fcs)-1:
                 id1, id2 = self.output.weight.shape
-                self.output = nn.Linear(id2-num, id1)
+                self.output = nn.Linear(max(id2-num, 1), id1)
                 self.output.weight.data = new_wo.clone().detach().requires_grad_(True)
             else:
                 id1, id2 = self.fcs[index+1].weight.shape
-                self.fcs[index+1] = nn.Linear(id2-num, id1)
+                self.fcs[index+1] = nn.Linear(max(id2-num, 1), id1)
                 self.fcs[index+1].weight.data = new_wo.clone().detach().requires_grad_(True)
-        self.num_nodes -= num
+        self.num_nodes = max(1, fin_neurons)
         return [self.num_layers, self.num_nodes]
 
     def add_layers(self, num):
@@ -130,7 +130,10 @@ class TestModel(nn.Module):
         x = len(self.fcs)-1
         for index in range(x, max(0,x-num), -1):
             self.fcs.__delitem__(index)
-        self.num_layers -= num
+        if x+1 > num:
+            self.num_layers -= num
+        else:
+            self.num_layers = 1
         
         return [self.num_layers, self.num_nodes]
 

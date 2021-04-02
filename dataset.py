@@ -8,7 +8,6 @@ from sklearn.preprocessing import StandardScaler
 
 import constants as C
 
-
 class Dataset():
     def __init__(self, path='churn_modelling.csv'):
         self.path = path

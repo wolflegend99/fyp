@@ -27,7 +27,7 @@ class DDPGAgent():
         
     def choose_action(self, observation, agent_no):
         self.localActor.eval()
-        state = torch.tensor([observation], dtype = torch.float32)
+        state = torch.tensor([observation], dtype = T.float32)
         action = self.localActor.forward(state)
         noisy_action = action + torch.tensor(self.actionNoise(), dtype = torch.float32)
 
