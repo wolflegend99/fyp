@@ -52,13 +52,13 @@ class Environment():
     if(model1_action >= 0):
         self.model1.add_neurons(int(model1_action))
     else:
-        self.model1.remove_neurons(int(-model1_action))
+        self.model1.remove_neurons(-int(model1_action))
     
     model2_action = model1_layers - model2_layers
     if(model2_action >= 0):
         self.model2.add_layers(int(model2_action))
     else:
-        self.model2.remove_layers(int(-model2_action))
+        self.model2.remove_layers(-int(model2_action))
     
     return [self.model2.num_layers, self.model1.num_nodes]
     

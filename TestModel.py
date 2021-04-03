@@ -90,13 +90,13 @@ class TestModel(nn.Module):
         # Getting the older weights of all layers
         weights = [fc.weight.data for fc in self.fcs]
         weights.append(self.output.weight.data)
-        fin_neurons = self.num_nodes - num
+        fin_neurons = max(self.num_nodes - num,1)
         for index in range(self.num_layers):
             #init_neurons = self.fcs[index].weight.shape[0]
-            #fin_neurons = num
+            #fin_neurons = init_neurons - num
 
             # Getting new weights by slicing the old weight tensor
-            fin_neurons = max(fin_neurons, 1)
+            #fin_neurons = max(fin_neurons, 1)
             new_wi = T.narrow(self.fcs[index].weight, 0, 0, fin_neurons)
             new_wo = T.narrow(weights[index+1], 1, 0, fin_neurons)
 
@@ -115,7 +115,7 @@ class TestModel(nn.Module):
                 id1, id2 = self.fcs[index+1].weight.shape
                 self.fcs[index+1] = nn.Linear(max(id2-num, 1), id1)
                 self.fcs[index+1].weight.data = new_wo.clone().detach().requires_grad_(True)
-        self.num_nodes = max(1, fin_neurons)
+        self.num_nodes = fin_neurons
         return [self.num_layers, self.num_nodes]
 
     def add_layers(self, num):
@@ -131,10 +131,13 @@ class TestModel(nn.Module):
         x = len(self.fcs)-1
         for index in range(x, max(0,x-num), -1):
             self.fcs.__delitem__(index)
-        if x+1 > num:
+        '''
+         if x > num:
             self.num_layers -= num
         else:
             self.num_layers = 1
+        '''
+        self.num_layers = len(self.fcs)
         
         return [self.num_layers, self.num_nodes]
 
@@ -149,7 +152,8 @@ class TestModel(nn.Module):
             correct = 0
             total = 0
             train_loss = 0
-            for data, target in trainloader:   # print("Target = ",target[0].item())
+            loader = iter(trainloader)
+            for data, target in loader:   # print("Target = ",target[0].item())
                 # clear the gradients of all optimized variables
                 self.optimizer.zero_grad()
                 # forward pass: compute predicted outputs by passing inputs to the model
