@@ -8,7 +8,7 @@ from statistics import mean
 
 
 class TestModel(nn.Module):
-    def __init__(self, input_dims, output_dims, lr, num_layers, num_nodes):
+    def __init__(self, input_dims, output_dims, lr, num_layers, num_nodes, trainloader, testloader):
         super(TestModel, self).__init__()
         self.input_dims = input_dims
         self.lr = lr
@@ -21,6 +21,8 @@ class TestModel(nn.Module):
         self.initialise(num_layers, num_nodes)
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        self.trainloader = trainloader
+        self.testloader = testloader
         # self.criterion = nn.BCELoss()
         
 
@@ -91,13 +93,13 @@ class TestModel(nn.Module):
         weights = [fc.weight.data for fc in self.fcs]
         weights.append(self.output.weight.data)
         fin_neurons = max(self.num_nodes - num,1)
-        for index in range(self.num_layers):
+        for index in range(len(self.fcs)):
             #init_neurons = self.fcs[index].weight.shape[0]
             #fin_neurons = init_neurons - num
 
             # Getting new weights by slicing the old weight tensor
             #fin_neurons = max(fin_neurons, 1)
-            new_wi = T.narrow(self.fcs[index].weight, 0, 0, fin_neurons)
+            new_wi = T.narrow(self.fcs[index].weight.data, 0, 0, fin_neurons)
             new_wo = T.narrow(weights[index+1], 1, 0, fin_neurons)
 
             # reset weight and grad variables to new size
@@ -145,20 +147,20 @@ class TestModel(nn.Module):
         x = next(self.parameters()).data
         print(x)
 
-    def train(self, trainloader):
+    def train(self):
 
         loss_list, acc_list = [], []
         for epochs in range(C.EPOCHS):
             correct = 0
             total = 0
             train_loss = 0
-            loader = iter(trainloader)
+            loader = iter(self.trainloader)
             for data, target in loader:   # print("Target = ",target[0].item())
                 # clear the gradients of all optimized variables
                 self.optimizer.zero_grad()
                 # forward pass: compute predicted outputs by passing inputs to the model
                 output = self.forward(data.float())
-                target = target.type(T.FloatTensor)
+                #target = target.type(T.FloatTensor)
                 loss = self.criterion(output, target.long().squeeze())
                 # backward pass: compute gradient of the loss with respect to model parameters
                 loss.backward()
@@ -177,19 +179,19 @@ class TestModel(nn.Module):
         return mean(acc_list[-4:]), mean(loss_list[-4:])
     
     
-    def test(self, testloader):
+    def test(self):
         correct = 0
         total = 0
         val_loss = 0
         with T.no_grad():
-            for data, target in testloader:
+            for data, target in self.testloader:
 
             # Predict Output
                 output = self.forward(data.float())
 
             # Calculate Loss
-                target = target.view(-1)
-                loss = self.criterion(output, target)
+                #target = target.view(-1)
+                loss = self.criterion(output, target.squeeze())
                 val_loss += loss.item()*data.size(0)
             # Get predictions from the maximum value
                 _, predicted = T.max(output.data, 1)
@@ -201,6 +203,6 @@ class TestModel(nn.Module):
                 correct += (predicted == target.squeeze()).sum().item()
 
     # calculate average training loss and accuracy over an epoch
-        val_loss = val_loss/len(testloader.dataset)
+        val_loss = val_loss/len(self.testloader.dataset)
         accuracy = 100 * correct/float(total)
         return accuracy, val_loss

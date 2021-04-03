@@ -17,14 +17,15 @@ class Environment():
     self.X, self.y = self.dataset.preprocess()
     self.X_train, self.X_test, self.y_train, self.y_test = self.dataset.split(self.X, self.y, fraction=0.2)
     self.X_train, self.X_test = self.dataset.scale(self.X_train, self.X_test)
-    self.train_loader, self.test_loader = H.load(self.X_train, self.X_test,
-                                                 self.y_train, self.y_test)
+    self.train_loader, self.test_loader = H.load(self.X_train, self.X_test, self.y_train, self.y_test)
     
     self.input_dims = [self.X.shape[1]]
     self.output_dims = len(np.unique(self.y))
-    
-    self.model1 = TestModel(self.input_dims, self.output_dims, 0.005, 3, 8)
-    self.model2 = TestModel(self.input_dims, self.output_dims, 0.005, 3, 8)
+    print("Dims of X_train is {}".format(H.get_dimensions(data = self.X_train)))
+    print("Dims of y_train is {}".format(H.get_dimensions(data = self.y_train)))
+    print("Input dims is {}, output dims is {}".format(self.input_dims, self.output_dims))
+    self.model1 = TestModel(self.input_dims, self.output_dims, 0.005, 3, 3, self.train_loader, self.test_loader)
+    self.model2 = TestModel(self.input_dims, self.output_dims, 0.005, 3, 3, self.train_loader, self.test_loader)
 
   def reset(self):
     layers = np.random.randint(C.MIN_HIDDEN_LAYERS, C.MAX_HIDDEN_LAYERS)
@@ -70,9 +71,9 @@ class Environment():
         next_state = self.model1.add_layers(int(action))
     else:
         next_state = self.model1.remove_layers(-int(action))
-    train_acc, train_loss = self.model1.train(self.train_loader)
+    train_acc, train_loss = self.model1.train()
     
-    test_acc, test_loss = self.model1.test(self.test_loader)
+    test_acc, test_loss = self.model1.test()
     reward = H.reward(train_acc, train_loss,
                       test_acc, test_loss,
                       next_state, 0,
@@ -88,8 +89,8 @@ class Environment():
         next_state = self.model2.add_neurons(int(action))
     else:
         next_state = self.model2.remove_neurons(-int(action))
-    train_acc, train_loss = self.model2.train(self.train_loader)
-    test_acc, test_loss = self.model2.test(self.test_loader)
+    train_acc, train_loss = self.model2.train()
+    test_acc, test_loss = self.model2.test()
     reward = H.reward(train_acc, train_loss,
                       test_acc, test_loss,
                       next_state, 1,

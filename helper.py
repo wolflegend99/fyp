@@ -14,8 +14,8 @@ def load(X_train, X_test, y_train, y_test):
     train = torch.utils.data.TensorDataset(X_train, y_train)
     test = torch.utils.data.TensorDataset(X_test, y_test)
     # Create train and test data loaders
-    train_loader = torch.utils.data.DataLoader(train, batch_size = C.BATCH_SIZE, shuffle = True)
-    test_loader = torch.utils.data.DataLoader(test, batch_size = C.BATCH_SIZE, shuffle = True)
+    train_loader = torch.utils.data.DataLoader(train, batch_size = C.TRAIN_BATCH_SIZE, shuffle = True)
+    test_loader = torch.utils.data.DataLoader(test, batch_size = C.TRAIN_BATCH_SIZE, shuffle = True)
     return train_loader, test_loader
 
 #0 is reward for layers
@@ -43,7 +43,7 @@ def shuffle(data):
     return data.sample(frac=1)
 
 
-def get_dimensions(self, data):
+def get_dimensions(data):
     return data.shape
 
 class OrnsteinUhlenbeckActionNoise():
