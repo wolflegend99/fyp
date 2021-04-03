@@ -34,8 +34,9 @@ class MADDPG:
             for i in range(self.num_agents):
                 self.agents[i].actionNoise.reset()
             while steps != self.num_agents * max_steps:
-                #steps += 1
+                steps += 1
                 action, rounded_action = self.agents[agent_no].choose_action(agent_states[agent_no], agent_no)
+                print("Step: ", steps)
                 print("Agent : ", agent_no)
                 print("Action: ", action)
                 #rint(rounded_action)
@@ -53,11 +54,11 @@ class MADDPG:
                 print("Agent ", agent_no, " -> Reward", reward)
                 print("Agent ", agent_no, " -> Returns ",returns[agent_no])
                 if steps % C.SYNCH_STEPS == 0:
-                    print("Syncing at step ", step, "...")
+                    print("Syncing at step ", steps, "...")
                     synched_states = self.env.synch()
                     agent_states = [synched_states for i in range(self.num_agents)]
                 agent_no = (agent_no + 1) % self.num_agents
-                step+=1
+                #steps+=1
                 print("\n-----------------------------------------------------------------\n")
                 
             for i in range(self.num_agents):
