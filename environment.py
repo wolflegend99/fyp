@@ -11,7 +11,7 @@ import helper as H
 from TestModel import TestModel
 
 class Environment():
-  def __init__(self, path='churn_modelling.csv', ):
+  def __init__(self, path='churn_modelling.csv'):
     self.path = path
     self.dataset = Dataset(path = self.path)
     self.X, self.y = self.dataset.preprocess()
@@ -67,17 +67,17 @@ class Environment():
   
   def change_layers(self, action):
     
+    current_layers = self.model1.num_layers
     if action >= 0:
         next_state = self.model1.add_layers(int(action))
     else:
         next_state = self.model1.remove_layers(-int(action))
     train_acc, train_loss = self.model1.train()
-    
     test_acc, test_loss = self.model1.test()
     reward = H.reward(train_acc, train_loss,
                       test_acc, test_loss,
                       next_state, 0,
-                      self.input_dims, self.output_dims)
+                      self.input_dims, self.output_dims, action, current_layers)
     # reward = reward - punishment
     print("Train_acc : ", train_acc)
     print("Test_acc : ", test_acc)
@@ -85,6 +85,7 @@ class Environment():
   
   def change_neurons(self, action):
     
+    current_nodes = self.model2.num_nodes
     if action >= 0:
         next_state = self.model2.add_neurons(int(action))
     else:
@@ -94,7 +95,7 @@ class Environment():
     reward = H.reward(train_acc, train_loss,
                       test_acc, test_loss,
                       next_state, 1,
-                      self.input_dims, self.output_dims)
+                      self.input_dims, self.output_dims, action, current_nodes)
     print("Train_acc : ", train_acc)
     print("Test_acc : ", test_acc)
     return (next_state, reward)

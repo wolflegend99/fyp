@@ -13,13 +13,13 @@ class CriticNetwork(nn.Module):
         self.lr = lr
         self.input_shape = input_dims
         self.n_actions = n_actions
-        self.fc1 = nn.Linear(*input_dims,400)
-        self.batch1 = nn.LayerNorm(400)
-        self.fc2 = nn.Linear(400,300)
-        self.batch2 = nn.LayerNorm(300)
-        self.fc3 = nn.Linear(300, 1)
+        self.fc1 = nn.Linear(*input_dims,40)
+        self.batch1 = nn.LayerNorm(40)
+        self.fc2 = nn.Linear(40,30)
+        self.batch2 = nn.LayerNorm(30)
+        self.fc3 = nn.Linear(30, 1)
     
-        self.action_value = nn.Linear(n_actions, 300)
+        self.action_value = nn.Linear(n_actions, 30)
 
         self.optimizer = optim.Adam(self.parameters(), lr = self.lr, weight_decay=0.01)
 
