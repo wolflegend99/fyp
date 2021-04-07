@@ -81,6 +81,8 @@ class Environment():
     # reward = reward - punishment
     print("Train_acc : ", train_acc)
     print("Test_acc : ", test_acc)
+    print("Train_loss : ", train_loss)
+    print("Test_loss : ", test_loss)
     return (next_state, reward)
   
   def change_neurons(self, action):
@@ -98,6 +100,8 @@ class Environment():
                       self.input_dims, self.output_dims, action, current_nodes)
     print("Train_acc : ", train_acc)
     print("Test_acc : ", test_acc)
+    print("Train_loss : ", train_loss)
+    print("Test_loss : ", test_loss)
     return (next_state, reward)
   
  
