@@ -26,6 +26,7 @@ class MADDPG:
         means = [0 for i in range(self.num_agents)]
         
         for i in range(max_episode):
+            print("Episode : {}".format(i))
             returns = [0 for i in range(self.num_agents)]
             state = self.env.reset()
             agent_states = [state for i in range(self.num_agents)]
