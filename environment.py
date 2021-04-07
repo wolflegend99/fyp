@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from dataset import Dataset
 import constants as C
 import helper as H
-from TestModel import TestModel
+from WithNewWeights import TestModel
 
 class Environment():
   def __init__(self, path='churn_modelling.csv'):
