@@ -103,7 +103,6 @@ class Environment():
     print("Train_loss : ", train_loss)
     print("Test_loss : ", test_loss)
     return (next_state, reward)
-  dddddd
- 
+
   def seed(self):
     pass 
