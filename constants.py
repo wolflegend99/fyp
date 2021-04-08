@@ -7,7 +7,7 @@ MAX_HIDDEN_LAYERS=6
 MIN_NODES=2
 MAX_NODES=12
 
-SYNCH_STEPS=15
+SYNCH_STEPS=30
 
 DIR_PATH='./datasets/' ###configure this on local repo
 

@@ -57,7 +57,7 @@ class DDPGAgent():
         Q_prime = self.targetCritic.forward(next_states, target_actions)
 
         #Q_prime[done] = 0.0
-        Q_prime = Q_prime.view(-1)
+        #Q_prime = Q_prime.view(-1)
         y_prime = rewards + self.gamma*Q_prime
         #y_prime = y_prime.view(self.batch_size, 1)
 
