@@ -1,6 +1,7 @@
 import constants as C
 import torch
 import numpy as np
+from math import sqrt
 
 def load(X_train, X_test, y_train, y_test):
     # Numpy to Tensor Conversion (Train Set)
@@ -34,21 +35,27 @@ def reward(train_acc, train_loss,
         value -= ((x[1]**2)/100)*6.25
         if action <=0 and main_param == 1:
             value -= 500
+            
     value -= train_loss*7
     value += (test_acc/100)*10
     return value
 
 def reward1(train_acc, train_loss, test_acc, test_loss, x, which, in_dims, out_dims, action, main_param):
-    trainable = (in_dims + out_dims)*x[1] + x[1]*x[1]*x[0] + out_dims + x[1]*x[0]
+    
+    trainable = (in_dims + out_dims)*x[1] + x[1]*x[1]*x[0] + x[1]*x[0]
     value = 0
     if which == 0:
-        value -= (trainable/(x[1]**2))*0.25
+        value -= (trainable/(x[1]**2))*0.7
         if action <=0 and main_param == 1:
-            value -= 500
+            value -= 100
+        if action >=0 and main_param >= C.MAX_HIDDEN_LAYERS:
+            value -= 100
     else:
-        value -= sqrt((trainable/x[0]))*0.25
+        value -= sqrt((trainable/x[0]))*0.7
         if action <=0 and main_param == 1:
-            value -= 500
+            value -= 100
+        if action >=0 and main_param >= C.MAX_NODES:
+            value -= 100
     value -= train_loss*7
     value += (test_acc/100)*10
     return value

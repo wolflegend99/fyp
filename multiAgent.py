@@ -47,7 +47,7 @@ class MADDPG:
                     done = True
                 self.agents[agent_no].store_transition(agent_states[agent_no], action, reward, next_state)
                 print("Next state : ", next_state)
-                self.agents[agent_no].learn()
+                self.agents[agent_no].learn([agent_states[agent_no]], [action], [reward], [next_state])
                 returns[agent_no] += reward
                 agent_states[agent_no] = next_state
                 

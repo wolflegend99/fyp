@@ -77,7 +77,7 @@ class Environment():
     reward = H.reward1(train_acc, train_loss,
                       test_acc, test_loss,
                       next_state, 0,
-                      self.input_dims, self.output_dims, action, current_layers)
+                      int(self.X.shape[1]), self.output_dims, action, current_layers)
     # reward = reward - punishment
     print("Train_acc : ", train_acc)
     print("Test_acc : ", test_acc)
@@ -97,7 +97,7 @@ class Environment():
     reward = H.reward1(train_acc, train_loss,
                       test_acc, test_loss,
                       next_state, 1,
-                      self.input_dims, self.output_dims, action, current_nodes)
+                      self.X.shape[1], self.output_dims, action, current_nodes)
     print("Train_acc : ", train_acc)
     print("Test_acc : ", test_acc)
     print("Train_loss : ", train_loss)
