@@ -39,12 +39,12 @@ class DDPGAgent():
     def store_transition(self, state, action, reward, next_state):
         self.replayBuffer.store_transition(state, action, reward, next_state)
     
-    def learn(self):
+    def learn(self, states, actions, rewards, next_states):
 
-        if self.replayBuffer.mem_cntr < self.batch_size:
-            return
+        #if self.replayBuffer.mem_cntr < self.batch_size:
+        #    return
 
-        states, actions, rewards, next_states = self.replayBuffer.sample_buffer(self.batch_size)
+        #states, actions, rewards, next_states = self.replayBuffer.sample_buffer(self.batch_size)
 
         states = torch.tensor(states, dtype = torch.float)
         actions = torch.tensor(actions, dtype = torch.float)
@@ -57,9 +57,9 @@ class DDPGAgent():
         Q_prime = self.targetCritic.forward(next_states, target_actions)
 
         #Q_prime[done] = 0.0
-        Q_prime = Q_prime.view(-1)
+        #Q_prime = Q_prime.view(-1)
         y_prime = rewards + self.gamma*Q_prime
-        y_prime = y_prime.view(self.batch_size, 1)
+        #y_prime = y_prime.view(self.batch_size, 1)
 
 
         self.localCritic.optimizer.zero_grad()

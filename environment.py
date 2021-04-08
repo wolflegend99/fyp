@@ -74,7 +74,7 @@ class Environment():
         next_state = self.model1.remove_layers(-int(action))
     train_acc, train_loss = self.model1.train()
     test_acc, test_loss = self.model1.test()
-    reward = H.reward(train_acc, train_loss,
+    reward = H.reward1(train_acc, train_loss,
                       test_acc, test_loss,
                       next_state, 0,
                       int(self.X.shape[1]), self.output_dims, action, current_layers)
@@ -94,7 +94,7 @@ class Environment():
         next_state = self.model2.remove_neurons(-int(action))
     train_acc, train_loss = self.model2.train()
     test_acc, test_loss = self.model2.test()
-    reward = H.reward(train_acc, train_loss,
+    reward = H.reward1(train_acc, train_loss,
                       test_acc, test_loss,
                       next_state, 1,
                       self.X.shape[1], self.output_dims, action, current_nodes)
