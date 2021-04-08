@@ -40,7 +40,7 @@ class MADDPG:
                 print("Step: ", steps)
                 print("Agent : ", agent_no)
                 print("Action: ", action)
-                #rint(rounded_action)
+                #print(rounded_action)
                 next_state, reward = self.env.step(rounded_action, agent_no)
                 done = False
                 if reward == 0:
