@@ -27,13 +27,13 @@ class MADDPG:
         
         for i in range(max_episode):
             print("Episode : {}".format(i))
-            returns = [0 for i in range(self.num_agents)]
+            returns = [0 for j in range(self.num_agents)]
             state = self.env.reset()
-            agent_states = [state for i in range(self.num_agents)]
+            agent_states = [state for j in range(self.num_agents)]
             steps = 0
             agent_no = 0
-            for i in range(self.num_agents):
-                self.agents[i].actionNoise.reset()
+            for j in range(self.num_agents):
+                self.agents[j].actionNoise.reset()
             while steps != self.num_agents * max_steps:
                 steps += 1
                 action, rounded_action = self.agents[agent_no].choose_action(agent_states[agent_no], agent_no)
@@ -58,13 +58,13 @@ class MADDPG:
                 if steps % C.SYNCH_STEPS == 0:
                     print("Syncing at step ", steps, "...")
                     synched_states = self.env.synch()
-                    agent_states = [synched_states for i in range(self.num_agents)]
+                    agent_states = [synched_states for j in range(self.num_agents)]
                 agent_no = (agent_no + 1) % self.num_agents
                 #steps+=1
                 print("\n-----------------------------------------------------------------\n")
                 
-            for i in range(self.num_agents):
-                return_list[i].append(returns[i])
-                means[i] = np.mean(return_list[i][-20:])
+            for j in range(self.num_agents):
+                return_list[j].append(returns[j])
+                means[j] = np.mean(return_list[j][-20:])
             print("Score Model1 : ",means[0])
             print("Score model2 : ",means[1])
