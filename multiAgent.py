@@ -37,6 +37,7 @@ class MADDPG:
             while steps != self.num_agents * max_steps:
                 steps += 1
                 action, rounded_action = self.agents[agent_no].choose_action(agent_states[agent_no], agent_no)
+                print("Episode: ", i+1)
                 print("Step: ", steps)
                 print("Agent : ", agent_no)
                 print("Action: ", action)
