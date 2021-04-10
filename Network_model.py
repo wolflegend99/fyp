@@ -22,6 +22,7 @@ class CriticNetwork(nn.Module):
         self.action_value = nn.Linear(n_actions, 30)
 
         self.optimizer = optim.Adam(self.parameters(), lr = self.lr, weight_decay=0.01)
+        
 
         #self.initialize_weights_bias()
     def initialize_weights_bias(self):

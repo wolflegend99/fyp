@@ -7,6 +7,10 @@ import constants as C
 from statistics import mean
 
 
+device = T.device("cpu")
+if T.cuda.is_available():
+    device = T.device("cuda")
+
 class TestModel(nn.Module):
     def __init__(self, input_dims, output_dims, lr, num_layers, num_nodes, trainloader, testloader):
         super(TestModel, self).__init__()
@@ -22,6 +26,7 @@ class TestModel(nn.Module):
         self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
         self.trainloader = trainloader
         self.testloader = testloader
+        
         # self.criterion = nn.BCELoss()
         
 
@@ -163,6 +168,9 @@ class TestModel(nn.Module):
             loader = iter(self.trainloader)
             for data, target in loader:   # print("Target = ",target[0].item())
                 # clear the gradients of all optimized variables
+                data = data.to(device)
+                target = target.to(device)
+                
                 self.optimizer.zero_grad()
                 # forward pass: compute predicted outputs by passing inputs to the model
                 output = self.forward(data.float())
@@ -193,7 +201,8 @@ class TestModel(nn.Module):
         val_loss = 0
         with T.no_grad():
             for data, target in self.testloader:
-
+                data = data.to(device)
+                target = target.to(device)
             # Predict Output
                 output = self.forward(data.float())
 

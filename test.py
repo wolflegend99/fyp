@@ -52,37 +52,48 @@ agent1.learn()
 
 from environment import Environment
 env = Environment()
+'''
+s_dict = env.model1.optimizer.state_dict() 
+print(s_dict)
+env.step(2,0)
+s_dict = env.model1.optimizer.state_dict() 
+print(s_dict)
+'''
+
+#print(env.model1.weight)
 #print(env.model1)
+
 print("Initial model")
-param = iter(env.model1.parameters())
+param = iter(env.model2.parameters())
 for p in param:
     print(p)
 #print()
 
-print(env.model1.optimizer)
+print(env.model2.optimizer)
 print("\n===================================\n\n")
 print("Initial model + 2 layers")
-env.step(2, 0)
+env.step(2, 1)
 
-param = iter(env.model1.parameters())
+param = iter(env.model2.parameters())
 for p in param:
     print(p)
 #print()
 
-print(env.model1.optimizer)
+print(env.model2.optimizer)
 
 print("\n===================================\n\n")
-#env.step(0, 0)
-env.model1.train()
+env.step(0, 0)
+#env.model1.train()
 
-param = iter(env.model1.parameters())
+param = iter(env.model2.parameters())
 for p in param:
     print(p)
 #print()
 
-print(env.model1.optimizer)
+print(env.model2.optimizer)
 
 print("===================================")
+
 
 '''
 dataset = Dataset()

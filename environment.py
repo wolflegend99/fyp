@@ -10,6 +10,10 @@ import constants as C
 import helper as H
 from WithNewWeights import TestModel
 
+device = T.device("cpu")
+if T.cuda.is_available():
+    device = T.device("cuda")
+    
 class Environment():
   def __init__(self, path='churn_modelling.csv'):
     self.path = path
@@ -26,12 +30,16 @@ class Environment():
     print("Input dims is {}, output dims is {}".format(self.input_dims, self.output_dims))
     self.model1 = TestModel(self.input_dims, self.output_dims, 0.005, 3, 3, self.train_loader, self.test_loader)
     self.model2 = TestModel(self.input_dims, self.output_dims, 0.005, 3, 3, self.train_loader, self.test_loader)
+    self.model1 = self.model1.to(device)
+    self.model2 = self.model2.to(device)
 
   def reset(self):
     layers = np.random.randint(C.MIN_HIDDEN_LAYERS, C.MAX_HIDDEN_LAYERS)
     neurons = np.random.randint(C.MIN_NODES, C.MAX_NODES)
     self.model1.initialise(layers, neurons)
     self.model2.initialise(layers, neurons)
+    self.model1 = self.model1.to(device)
+    self.model2 = self.model2.to(device)
     
     return [layers, neurons]
 
@@ -52,14 +60,18 @@ class Environment():
     model1_action = model2_neurons - model1_neurons
     if(model1_action >= 0):
         self.model1.add_neurons(int(model1_action))
+        self.model1 = self.model1.to(device)
     else:
         self.model1.remove_neurons(-int(model1_action))
+        self.model1 = self.model1.to(device)
     
     model2_action = model1_layers - model2_layers
     if(model2_action >= 0):
         self.model2.add_layers(int(model2_action))
+        self.model2 = self.model2.to(device)
     else:
         self.model2.remove_layers(-int(model2_action))
+        self.model2 = self.model2.to(device)
     
     return [self.model2.num_layers, self.model1.num_nodes]
     
@@ -70,8 +82,10 @@ class Environment():
     current_layers = self.model1.num_layers
     if action >= 0:
         next_state = self.model1.add_layers(int(action))
+        self.model1 = self.model1.to(device)
     else:
         next_state = self.model1.remove_layers(-int(action))
+        self.model1 = self.model1.to(device)
     train_acc, train_loss = self.model1.train()
     test_acc, test_loss = self.model1.test()
     reward = H.reward(train_acc, train_loss,
@@ -90,8 +104,10 @@ class Environment():
     current_nodes = self.model2.num_nodes
     if action >= 0:
         next_state = self.model2.add_neurons(int(action))
+        self.model2 = self.model2.to(device)
     else:
         next_state = self.model2.remove_neurons(-int(action))
+        self.model2 = self.model2.to(device)
     train_acc, train_loss = self.model2.train()
     test_acc, test_loss = self.model2.test()
     reward = H.reward(train_acc, train_loss,
