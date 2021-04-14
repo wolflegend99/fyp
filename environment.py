@@ -43,6 +43,19 @@ class Environment():
     
     return [layers, neurons]
 
+  def reset1(self, agent_no):
+    layers = np.random.randint(C.MIN_HIDDEN_LAYERS, C.MAX_HIDDEN_LAYERS)
+    neurons = np.random.randint(C.MIN_NODES, C.MAX_NODES)
+    if agent_no == 0:
+        self.model1.initialise(layers, neurons)
+        self.model1 = self.model1.to(device)
+    else:
+        self.model2.initialise(layers, neurons)
+        self.model2 = self.model2.to(device)
+    
+    return [layers, neurons]
+    
+        
   def step(self, action, agent_no):
     if agent_no == 0:
       state_, reward = self.change_layers(action)
@@ -76,7 +89,18 @@ class Environment():
     return [self.model2.num_layers, self.model1.num_nodes]
     
     
-  
+  def synch1(self, synched_state, agent_no):
+    if agent_no == 0:
+        self.model1.initialise(synched_state[0], synched_state[1])
+        self.model1 = self.model1.to(device)
+    else:
+        self.model2.initialise(synched_state[0], synched_state[1])
+        self.model2 = self.model2.to(device)
+    
+    return [synched_state[0], synched_state[1]]
+        
+    
+    
   def change_layers(self, action):
     
     current_layers = self.model1.num_layers
