@@ -36,6 +36,7 @@ class DDPGAgent():
 
         self.localActor.train()
         #final_action = C.MAX_ACTION[agent_no]*noisy_action.detach().numpy()[0]
+        noisy_action = noisy_action.to('cpu')
         final_action = noisy_action.detach().numpy()[0]
 
         return (final_action[0], np.round(final_action)[0])
